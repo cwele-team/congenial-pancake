@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.movie-card').forEach(card => {
                     card.addEventListener('click', () => {
                         const movieId = card.dataset.movieId;
-                        window.location.href = `Filmy.php?id=${movieId}`;
+                        window.location.href = `player.php?id=${movieId}`;
                     });
                 });
 

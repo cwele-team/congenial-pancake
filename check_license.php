@@ -56,6 +56,25 @@ $userId = $sessionData['id'];
 // Pobierz videoid z parametru GET - sprawdź oba możliwe nazwy
 $videoId = $_GET['id'] ?? $_GET['videoid'] ?? $_GET['movieId'] ?? '';
 
+// Validate that videoId is a valid integer
+if (!is_numeric($videoId) || intval($videoId) <= 0) {
+    error_log("check_license.php: Invalid video ID format: " . $videoId);
+    http_response_code(400);
+    echo json_encode([
+        'error' => 'Nieprawidłowe ID filmu - musi być liczbą całkowitą większą od 0', 
+        'hasLicense' => false,
+        'debug' => [
+            'videoId' => $videoId,
+            'isNumeric' => is_numeric($videoId),
+            'intVal' => intval($videoId)
+        ]
+    ]);
+    exit;
+}
+
+// Convert to integer to ensure we're working with database ID
+$videoId = intval($videoId);
+
 // Log the received user ID and video ID
 error_log("check_license.php: Received userid = " . $userId . ", videoid = " . $videoId);
 

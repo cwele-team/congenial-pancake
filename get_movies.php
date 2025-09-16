@@ -43,7 +43,7 @@ try {
         }
 
         $movies[] = [
-            'id' => $row['id'],
+            'id' => (int)$row['id'],
             'title' => $row['tytul'],
             'imageUrl' => $row['miniaturka_url'] ?: 'https://via.placeholder.com/300x450?text=Brak+obrazu',
             'year' => $row['rok_produkcji'],
@@ -58,10 +58,18 @@ try {
         ];
     }
 
-    echo json_encode(['movies' => $movies]);
+    echo json_encode([
+        'success' => true,
+        'movies' => $movies,
+        'count' => count($movies)
+    ]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Database error: ' . $e->getMessage(),
+        'movies' => []
+    ]);
 }
 ?>

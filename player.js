@@ -179,13 +179,35 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        // Validate that movieId is a valid integer from database
+        const movieIdInt = parseInt(movieId);
+        if (isNaN(movieIdInt) || movieIdInt <= 0) {
+          console.log('❌ Invalid movie ID format:', movieId);
+          const videoWrapper = document.querySelector('.video-player');
+          videoWrapper.innerHTML = `
+            <div class="video-unavailable" style="text-align: center; padding: 60px 20px; color: #fff; background: #1a1a1a; border-radius: 10px;">
+              <div style="margin-bottom: 20px;">
+                <i data-lucide="alert-circle" style="width: 64px; height: 64px; color: #ff6b6b; margin-bottom: 20px;"></i>
+              </div>
+              <h3 style="margin-bottom: 15px; color: #ff6b6b;">Nieprawidłowe ID filmu</h3>
+              <p style="margin-bottom: 20px; color: #ccc;">ID filmu musi być liczbą całkowitą</p>
+              <a href="Filmy.php" class="btn btn-primary">
+                <i data-lucide="arrow-left"></i>
+                <span>Powrót do filmów</span>
+              </a>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
         // Make sure we have access to movies array
         const moviesArray = window.movies || [];
         console.log('🎬 Available movies count:', moviesArray.length);
-        console.log('🎬 Looking for movie with ID:', movieId);
+        console.log('🎬 Looking for movie with database ID:', movieIdInt);
 
         // Find movie in our movies array by database ID
-        const movie = moviesArray.find(m => m.id === parseInt(movieId));
+        const movie = moviesArray.find(m => m.id === movieIdInt);
         console.log('🎬 Movie details:', movie);
 
         if (movie) {
@@ -278,9 +300,9 @@ document.addEventListener('DOMContentLoaded', () => {
               showLoadingState();
 
               // Generate embed URL with secure token
-              console.log('🎥 Generating secure embed URL for movie:', movieId);
+              console.log('🎥 Generating secure embed URL for database movie ID:', movieIdInt);
 
-              fetch(`generate_video_token.php?movieId=${movieId}`)
+              fetch(`generate_video_token.php?movieId=${movieIdInt}`)
                 .then(response => response.json())
                 .then(data => {
                   if (data.success) {
@@ -399,8 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 purchaseButton.addEventListener('click', () => {
                   console.log('💸 Purchase button clicked');
                   
-                  // Use the movieId from URL which is already the database ID
-                  console.log('Using database movie ID:', movieId);
+                  // Use the validated database movie ID
+                  console.log('Using database movie ID:', movieIdInt);
                   
                   // Create form and submit to startPaymentExample.php
                   const form = document.createElement('form');
@@ -411,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   const movieIdInput = document.createElement('input');
                   movieIdInput.type = 'hidden';
                   movieIdInput.name = 'movieId';
-                  movieIdInput.value = movieId;
+                  movieIdInput.value = movieIdInt;
                   form.appendChild(movieIdInput);
 
                   document.body.appendChild(form);
@@ -425,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         } else {
           // Show error message if movie not found
-          console.log('❌ Movie not found for ID:', movieId);
+          console.log('❌ Movie not found for database ID:', movieIdInt);
           console.log('Available movie IDs:', moviesArray.map(m => m.id));
           const videoWrapper = document.querySelector('.video-player');
           videoWrapper.innerHTML = `
@@ -434,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       <i data-lucide="search-x" style="width: 64px; height: 64px; color: #ff6b6b; margin-bottom: 20px;" aria-hidden="true"></i>
                     </div>
                     <h3 style="margin-bottom: 15px; color: #ff6b6b;">Film nie został znaleziony</h3>
-                    <p style="margin-bottom: 10px; color: #ccc;">Nie znaleziono filmu o ID: <strong>${movieId}</strong></p>
+                    <p style="margin-bottom: 10px; color: #ccc;">Nie znaleziono filmu o ID: <strong>${movieIdInt}</strong></p>
                     <p style="margin-bottom: 20px; color: #888; font-size: 14px;">Dostępne filmy: ${moviesArray.length}</p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                       <a href="Filmy.php" class="btn btn-primary" aria-label="Zobacz wszystkie dostępne filmy">

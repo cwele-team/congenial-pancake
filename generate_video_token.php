@@ -63,6 +63,24 @@ try {
         exit;
     }
 
+    // Validate that movieId is a valid integer from database
+    if (!is_numeric($movieId) || intval($movieId) <= 0) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Movie ID must be a valid positive integer',
+            'debug' => [
+                'movieId' => $movieId,
+                'isNumeric' => is_numeric($movieId),
+                'intVal' => intval($movieId)
+            ]
+        ]);
+        exit;
+    }
+
+    // Convert to integer to ensure we're working with database ID
+    $movieId = intval($movieId);
+
     // Get video_id from database
     $stmt = $conn->prepare("SELECT video_id, tytul FROM Filmy WHERE id = ?");
     $stmt->bind_param("i", $movieId);
@@ -108,7 +126,7 @@ try {
             'error' => 'Movie not found',
             'debug' => [
                 'movieId' => $movieId,
-                'query' => "SELECT video_id, tytul FROM Filmy WHERE id = $movieId"
+                'query' => "SELECT video_id, tytul FROM Filmy WHERE id = " . $movieId
             ]
         ]);
     }

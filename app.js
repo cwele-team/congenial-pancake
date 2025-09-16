@@ -250,7 +250,7 @@ async function ensureCategoriesLoaded() {
           watchlistContainer.innerHTML = '<div class="empty-watchlist">Twoja lista do obejrzenia jest pusta</div>';
         } else {
           watchlistContainer.innerHTML = watchlist.map((movie) => {
-            return createMovieCard(movie, movie.id);
+            return createMovieCard(movie);
           }).join('');
         }
       } else {
@@ -283,7 +283,7 @@ async function ensureCategoriesLoaded() {
     }
 
     // Create movie card HTML
-    function createMovieCard(movie, index) {
+    function createMovieCard(movie) {
       const primaryCategory = movie.categories[0];
       const watchlistButtonClass = 'btn-secondary'; // Default to add button state
       const watchlistText = 'Dodaj do listy';
@@ -340,7 +340,7 @@ async function ensureCategoriesLoaded() {
       }
 
       moviesGrid.innerHTML = moviesToShow.map((movie) => {
-        return createMovieCard(movie, movie.id);
+        return createMovieCard(movie);
       }).join('');
 
       setupMovieOverlay();
@@ -860,7 +860,7 @@ async function ensureCategoriesLoaded() {
         noResults.style.display = 'none';
         
         movieGrid.innerHTML = moviesToDisplay.map((movie) => {
-          return createMovieCard(movie, movie.id);
+          return createMovieCard(movie);
         }).join('');
       }
       
@@ -936,7 +936,7 @@ async function ensureCategoriesLoaded() {
 
       if (recommendedMovies) {
         if (movies.length > 0) {
-          recommendedMovies.innerHTML = movies.map((movie) => createMovieCard(movie, movie.id)).join('');
+          recommendedMovies.innerHTML = movies.map((movie) => createMovieCard(movie)).join('');
         } else {
           recommendedMovies.innerHTML = '<div class="empty-section">Brak dostępnych filmów</div>';
         }
@@ -1018,7 +1018,7 @@ async function ensureCategoriesLoaded() {
             </div>
             <div class="movie-row" role="list" aria-label="Filmy z kategorii ${categoryName}">
               ${categoryMovies.map((movie) => {
-                return createMovieCard(movie, movie.id);
+                return createMovieCard(movie);
               }).join('')}
             </div>
           `;

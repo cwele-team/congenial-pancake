@@ -55,9 +55,17 @@ switch ($action) {
     case 'add':
         $data = json_decode(file_get_contents('php://input'), true);
         $movieId = $data['movieId'] ?? '';
-        $movieTitle = $data['movieTitle'] ?? ''; // Keep for backward compatibility
 
         if ($movieId) {
+            // Validate that movieId is a valid integer
+            if (!is_numeric($movieId) || intval($movieId) <= 0) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Movie ID must be a valid positive integer']);
+                exit;
+            }
+            
+            $movieId = intval($movieId);
+            
             // Use movie ID directly if provided
             $stmt = $conn->prepare("SELECT id FROM Filmy WHERE id = ?");
             $stmt->bind_param("i", $movieId);
@@ -71,23 +79,9 @@ switch ($action) {
                 echo json_encode(['error' => 'Movie not found']);
                 exit;
             }
-        } elseif ($movieTitle) {
-            // Fallback to title-based lookup for backward compatibility
-            $stmt = $conn->prepare("SELECT id FROM Filmy WHERE tytul = ?");
-            $stmt->bind_param("s", $movieTitle);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($movie = $result->fetch_assoc()) {
-                $movieIdToUse = $movie['id'];
-            } else {
-                http_response_code(404);
-                echo json_encode(['error' => 'Movie not found']);
-                exit;
-            }
         } else {
             http_response_code(400);
-            echo json_encode(['error' => 'Movie ID or title is required']);
+            echo json_encode(['error' => 'Movie ID is required']);
             exit;
         }
 
@@ -111,23 +105,23 @@ switch ($action) {
     case 'remove':
         $data = json_decode(file_get_contents('php://input'), true);
         $movieId = $data['movieId'] ?? '';
-        $movieTitle = $data['movieTitle'] ?? ''; // Keep for backward compatibility
 
         if ($movieId) {
+            // Validate that movieId is a valid integer
+            if (!is_numeric($movieId) || intval($movieId) <= 0) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Movie ID must be a valid positive integer']);
+                exit;
+            }
+            
+            $movieId = intval($movieId);
+            
             // Use movie ID directly if provided
             $stmt = $conn->prepare("DELETE FROM Watchlist WHERE id_uzytkownika = ? AND id_filmu = ?");
             $stmt->bind_param("ii", $userId, $movieId);
-        } elseif ($movieTitle) {
-            // Fallback to title-based removal for backward compatibility
-            $stmt = $conn->prepare("
-                DELETE w FROM Watchlist w
-                JOIN Filmy f ON w.id_filmu = f.id
-                WHERE w.id_uzytkownika = ? AND f.tytul = ?
-            ");
-            $stmt->bind_param("is", $userId, $movieTitle);
         } else {
             http_response_code(400);
-            echo json_encode(['error' => 'Movie ID or title is required']);
+            echo json_encode(['error' => 'Movie ID is required']);
             exit;
         }
 

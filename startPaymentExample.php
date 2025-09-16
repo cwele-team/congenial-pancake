@@ -31,6 +31,12 @@
     }
 
     $movieId = intval($_POST['movieId']);
+    
+    // Validate that movieId is a valid positive integer
+    if ($movieId <= 0) {
+        die('Nieprawidłowe ID filmu - musi być liczbą całkowitą większą od 0');
+    }
+    
     $userId = $sessionData['id'];
     
     // Debug logging
